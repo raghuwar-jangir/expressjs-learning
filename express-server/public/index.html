@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Express.js - Minimalist Web Framework for Node.js</title>
+</head>
+<body style="margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; color: #333; background-color: #f7f9fa; line-height: 1.6;">
+
+    <!-- Navigation -->
+    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;">
+        <div style="font-size: 24px; font-weight: bold; color: #303030;">
+            <span style="color: #000000;">Express</span>JS
+        </div>
+        <div>
+            <a href="#features" style="margin-left: 25px; text-decoration: none; color: #666; font-weight: 500;">Features</a>
+            <a href="#getting-started" style="margin-left: 25px; text-decoration: none; color: #666; font-weight: 500;">Get Started</a>
+            <a href="https://expressjs.com/" target="_blank" style="margin-left: 25px; text-decoration: none; background-color: #000000; color: #ffffff; padding: 10px 20px; border-radius: 5px; font-weight: 500; display: inline-block;">Documentation</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header style="text-align: center; padding: 100px 20px; background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); color: #ffffff;">
+        <h1 style="font-size: 48px; margin-bottom: 20px; font-weight: 800;">Fast, Unopinionated, Minimalist <br><span style="color: #68d391;">Web Framework for Node.js</span></h1>
+        <p style="font-size: 20px; color: #cbd5e0; max-width: 700px; margin: 0 auto 40px auto;">Learn to build robust APIs, web applications, and microservices quickly with Express.js.</p>
+        <div style="display: flex; justify-content: center; gap: 20px;">
+            <a href="https://expressjs.com/en/starter/installing.html" target="_blank" style="text-decoration: none; background-color: #68d391; color: #1a202c; padding: 15px 30px; border-radius: 8px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Install Express</a>
+            <a href="#getting-started" style="text-decoration: none; background-color: transparent; color: #ffffff; padding: 15px 30px; border-radius: 8px; font-size: 18px; border: 2px solid #cbd5e0;">View Code Example</a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" style="max-width: 1200px; margin: 0 auto; padding: 80px 20px;">
+        <h2 style="text-align: center; font-size: 36px; margin-bottom: 50px; color: #2d3748;">Why Learn Express.js?</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
+                <div style="font-size: 30px; margin-bottom: 15px;">⚡</div>
+                <h3 style="font-size: 20px; margin-bottom: 10px; color: #2d3748;">Extremely Minimalist</h3>
+                <p style="color: #666;">Provides a thin layer of fundamental web application features without obscuring Node.js features.</p>
+            </div>
+            <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
+                <div style="font-size: 30px; margin-bottom: 15px;">🧩</div>
+                <h3 style="font-size: 20px; margin-bottom: 10px; color: #2d3748;">Robust Routing</h3>
+                <p style="color: #666;">Define routes easily using HTTP verbs and URLs, making your backend highly structured and readable.</p>
+            </div>
+            <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
+                <div style="font-size: 30px; margin-bottom: 15px;">⚙️</div>
+                <h3 style="font-size: 20px; margin-bottom: 10px; color: #2d3748;">Powerful Middleware</h3>
+                <p style="color: #666;">Create or use thousands of middleware packages to perform tasks like parsing data, authentication, and error handling.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Example Section -->
+    <section id="getting-started" style="background-color: #2d3748; color: #ffffff; padding: 80px 20px;">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <h2 style="text-align: center; font-size: 36px; margin-bottom: 30px;">Get Started in Minutes</h2>
+            <p style="text-align: center; font-size: 18px; color: #cbd5e0; margin-bottom: 50px;">Creating a basic web server is incredibly straightforward.</p>
+            
+            <!-- Code Block -->
+            <pre style="background-color: #1a202c; padding: 30px; border-radius: 12px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; font-size: 16px; color: #d6e4f0;">
+<span style="color: #a0aec0;">// Import express</span>
+<span style="color: #f6ad55;">const</span> <span style="color: #fc8181;">express</span> = <span style="color: #f6ad55;">require</span>(<span style="color: #68d391;">'express'</span>);
+<span style="color: #f6ad55;">const</span> <span style="color: #fc8181;">app</span> = <span style="color: #68d391;">express</span>();
+<span style="color: #f6ad55;">const</span> <span style="color: #fc8181;">port</span> = <span style="color: #fc8181;">3000</span>;
+
+<span style="color: #a0aec0;">// Define a route for the root URL</span>
+<span style="color: #fc8181;">app</span>.<span style="color: #68d391;">get</span>(<span style="color: #68d391;">'/'</span>, (req, res) => {
+  <span style="color: #fc8181;">res</span>.<span style="color: #68d391;">send</span>(<span style="color: #68d391;">'Hello World! Welcome to Express.js'</span>);
+});
+
+<span style="color: #a0aec0;">// Start the server</span>
+<span style="color: #fc8181;">app</span>.<span style="color: #68d391;">listen</span>(port, () => {
+  <span style="color: #68d391;">console</span>.<span style="color: #68d391;">log</span>(<span style="color: #68d391;">`Server running at http://localhost:${port}`</span>);
+});</pre>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background-color: #ffffff; padding: 40px 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+        <p style="color: #666; margin: 0;">&copy; 2026 Learn Express.js Landing Page. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
