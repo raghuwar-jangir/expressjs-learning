@@ -1,0 +1,24 @@
+Express APP/
+│
+├── src/    
+│   ├── app.js              # Express app setup — middlewares, routes wired here
+│   ├── server.js           # ONLY job: call app.listen() — separation of concerns
+│   │
+│   ├── routes/
+│   │   └── logs.router.js  # All /logs routes live here — keeps app.js clean
+│   │
+│   ├── controllers/
+│   │   └── logs.controller.js  # Business logic — what happens when a route is hit
+│   │
+│   ├── middleware/
+│   │   ├── requestTimer.js     # Custom middleware — stamps req.startTime
+│   │   └── errorHandler.js     # Global error middleware — catches all thrown errors
+│   │
+│   ├── store/
+│   │   └── logs.store.js       # In-memory array acting as your "database" for logs
+│   │
+│   └── logs/
+│       └── access.log          # Morgan writes here via fs write stream
+│
+├── package.json
+└── .gitignore

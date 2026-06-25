@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RequestLens</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0e14;
+      --surface:   #111520;
+      --border:    #1e2535;
+      --accent:    #4fffb0;
+      --accent-dim:#1a4d3a;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --danger:    #ff4f6e;
+      --warn:      #ffb84f;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--text); }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      padding: 0.3rem 0.8rem;
+    }
+
+    .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1.4rem;
+    }
+
+    h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      color: var(--text);
+      margin-bottom: 1.2rem;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 460px;
+      line-height: 1.7;
+      margin-bottom: 2.8rem;
+    }
+
+    /* ── TERMINAL BLOCK ── */
+    .terminal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 540px;
+      text-align: left;
+      overflow: hidden;
+      margin-bottom: 3.5rem;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: #0d1018;
+    }
+
+    .terminal-bar span {
+      width: 11px; height: 11px; border-radius: 50%;
+    }
+
+    .t-red    { background: #ff5f57; }
+    .t-yellow { background: #febc2e; }
+    .t-green  { background: #28c840; }
+
+    .terminal-body {
+      padding: 1.2rem 1.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 2;
+    }
+
+    .t-muted   { color: var(--muted); }
+    .t-accent  { color: var(--accent); }
+    .t-warn    { color: var(--warn); }
+    .t-danger  { color: var(--danger); }
+    .t-text    { color: var(--text); }
+
+    /* ── ENDPOINTS GRID ── */
+    .endpoints {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      max-width: 860px;
+      width: 100%;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .method {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .get    { background: #0d2e1a; color: #4fffb0; border: 1px solid #4fffb0; }
+    .post   { background: #1e2a0d; color: #a3e635; border: 1px solid #a3e635; }
+    .delete { background: #2e0d14; color: #ff4f6e; border: 1px solid #ff4f6e; }
+
+    .card-info {}
+    .card-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .card-desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    footer em { color: var(--accent); font-style: normal; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Request<span>Lens</span></div>
+    <div class="status-pill"><span class="dot"></span> server running</div>
+  </nav>
+
+  <main class="hero">
+    <p class="eyebrow">HTTP Request Inspector API</p>
+    <h1>Every request,<br /><em>fully visible.</em></h1>
+    <p class="subtitle">
+      A developer tool to capture, log, and inspect HTTP traffic in real time.
+      Built with Express.js — routes, middleware, Morgan, and file streams.
+    </p>
+
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="t-red"></span>
+        <span class="t-yellow"></span>
+        <span class="t-green"></span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-muted">$</span> <span class="t-accent">curl</span> <span class="t-text">-X GET http://localhost:4001/health</span></div>
+        <div><span class="t-muted"># response</span></div>
+        <div><span class="t-accent">{ "status": "ok" }</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-muted">$</span> <span class="t-accent">curl</span> <span class="t-text">-X POST http://localhost:4001/logs \</span></div>
+        <div><span class="t-text">&nbsp;&nbsp;-H "Content-Type: application/json" \</span></div>
+        <div><span class="t-text">&nbsp;&nbsp;-d '{"message": "deploy triggered"}'</span></div>
+        <div><span class="t-warn">→ 201 Created</span></div>
+      </div>
+    </div>
+
+    <div class="endpoints">
+      <div class="card">
+        <span class="method get">GET</span>
+        <div class="card-info">
+          <div class="card-path">/health</div>
+          <div class="card-desc">Server status check</div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="method post">POST</span>
+        <div class="card-info">
+          <div class="card-path">/logs</div>
+          <div class="card-desc">Capture a new log entry</div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="method get">GET</span>
+        <div class="card-info">
+          <div class="card-path">/logs</div>
+          <div class="card-desc">Retrieve all log entries</div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="method get">GET</span>
+        <div class="card-info">
+          <div class="card-path">/logs/:id</div>
+          <div class="card-desc">Get a single log by ID</div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="method delete">DEL</span>
+        <div class="card-info">
+          <div class="card-path">/logs/:id</div>
+          <div class="card-desc">Remove a log entry</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    built by <em>raghuwar</em> · express.js practice project · requestlens v1.0
+  </footer>
+
+</body>
+</html>
