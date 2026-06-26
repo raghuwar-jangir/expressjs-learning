@@ -4,11 +4,23 @@ const express = require("express");
 // hence => circular dependency
 
 const monstersRouter = express.Router();
+const secretRouter = express.Router();
 
 const monsters = {
-  hydra: { height: 3, age: 4 },
-  dragon: { height: 200, age: 350 },
+  hydra: { height: 3, age: 4, secret: "I am human monster" },
+  dragon: { height: 200, age: 350, secret: "I am alien monster" },
 };
+
+monstersRouter.use("/:name", secretRouter);
+monstersRouter.param("name", (req, res, next, value) => {
+  req.name = value;
+  next();
+});
+
+secretRouter.get("/secret", (req, res, next) => {
+  console.log("name of monster >>", req.name);
+  res.send(monsters[req.name].secret);
+});
 
 monstersRouter.get("/", (req, res, next) => {
   setTimeout(() => {
@@ -16,12 +28,14 @@ monstersRouter.get("/", (req, res, next) => {
   }, 1000);
 });
 
-monstersRouter.get("/:name", (req, res) => {
-  const monster = monsters[req.params.id];
-  if (monster) {
-    return res.status(200).send(monster);
-  }
-  return res.status(404).send("monster not found");
+monstersRouter.get("/:name", (req, res, next) => {
+  console.log("this monster router running");
+  next();
+  // const monster = monsters[req.params.name];
+  // if (monster) {
+  //   return res.status(200).send(monster);
+  // }
+  // return res.status(404).send("monster not found");
 });
 
 monstersRouter.put("/:name", (req, res) => {
@@ -42,7 +56,7 @@ monstersRouter.post("/", (req, res) => {
   return res.status(201).send(monsters[newMonster.name]);
 });
 
-monstersRouter.delete("/:name", (req, res) => {
+monstersRouter.delete("/:name", (req, res, next) => {
   if (monsters[req.params.name]) {
     delete monsters[req.params.name];
     return res.status(204).send();
