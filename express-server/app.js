@@ -78,14 +78,23 @@ app.post("/beans", (req, res) => {
   });
 });
 
-app.get("/beans/:name", checkAuth, (_, res, next) => {
-  if (Math.random() > 0.5) {
-    return res.send();
-  } else {
-    const err = new Error("Number is lower than 0.5");
-    err.status = 400;
-    return next(err);
-  }
+app.param("name", (req, res, next, value) => {
+  console.log("name>> ", value);
+  next();
+});
+
+app.get("/beans/:name", (_, res, next) => {
+  // if (Math.random() > 0.5) {
+  return res.send();
+  // } else {
+  //   const err = new Error("Number is lower than 0.5");
+  //   err.status = 400;
+  //   return next(err);
+  // }
+});
+
+app.get("/jeans/:name", (req, res, next) => {
+  res.send();
 });
 
 app.post("/beans/:name", (req, res) => {
@@ -106,10 +115,13 @@ app.post("/beans/:name", (req, res) => {
 //   return;
 // });
 
-app.use(errorhandler());
-
 const monstersRouter = require("./routers/monsters.js");
 app.use("/monsters", monstersRouter);
+app.get("/monsters/:name", (req, res, next) => {
+  console.log("request arrived here");
+  next();
+});
+app.use(errorhandler());
 
 module.exports = {
   app,
