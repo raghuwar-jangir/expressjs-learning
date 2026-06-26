@@ -5,7 +5,12 @@
 // Sends res.json() back
 // Has zero knowledge of how data is stored
 
-const { addLog, getAllLogs, getLogById, deleteLog } = require("../store/logs");
+const {
+  addLog,
+  getAllLogs,
+  getLogById,
+  deleteLog,
+} = require("../store/logs.store");
 
 const findAll = (req, res) => {
   const data = getAllLogs();
