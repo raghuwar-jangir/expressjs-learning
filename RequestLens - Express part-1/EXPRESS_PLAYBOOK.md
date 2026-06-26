@@ -312,6 +312,85 @@ const requestTimer = (req, res, next) => {
 
 ---
 
+## 🔗 Nested Routers + router.param
+
+### mergeParams: true
+
+When nesting routers, child router cannot access parent router's
+route parameters by default — they are undefined.
+`mergeParams: true` tells Express to merge parent params into child's
+`req.params` so child router has access to all parameters in the full path.
+
+​```js
+// ❌ without mergeParams — req.params.logId is undefined in tagsRouter
+const tagsRouter = express.Router();
+
+// ✅ with mergeParams — req.params.logId available in tagsRouter
+const tagsRouter = express.Router({ mergeParams: true });
+​```
+
+### router.param
+
+A special middleware that intercepts ALL requests on that router
+containing a specific parameter name. Fires before any route handler.
+
+Main use case:
+
+- Find resource existence once
+- Attach found item to `req` (e.g. `req.log`)
+- Pass forward via `next()` — or return early with 404 if not found
+- Eliminates repeated existence checks across multiple route handlers
+
+​`js
+logsRouter.param("logId", (req, res, next, logId) => {
+  const log = getLogById(+logId);
+  if (!log) {
+    const err = new Error("Log not found");
+    err.status = 404;
+    return next(err); // exit early — child controllers never run
+  }
+  req.log = log; // attach — child controllers just use req.log
+  next();
+});
+​`
+
+### Why param middleware on parent router, not child?
+
+Parent router's direct routes (GET /logs/:id, DELETE /logs/:id)
+handle their own existence checks inside their controllers —
+they are self-contained.
+
+Child router (tagsRouter) needs existence check on EVERY route —
+`findAllTags`, `findOneTag`, `addTag` all need a valid log first.
+Instead of repeating this in every tag controller, param middleware
+on logsRouter does it once and passes `req.log` down.
+
+This keeps routers loosely coupled:
+
+- tagsRouter doesn't care HOW the log was fetched or validated
+- It just trusts req.log is there — like a relay baton passed forward
+- Tomorrow if store changes to PostgreSQL — tagsRouter doesn't change at all
+
+### When to use param middleware vs controller existence check
+
+| Scenario                                        | Where to check           |
+| ----------------------------------------------- | ------------------------ |
+| Only one route needs the resource               | Controller               |
+| Multiple child router routes need same resource | `router.param` on parent |
+| Resource belongs to parent router               | `router.param` on parent |
+
+### The Relay Race Pattern
+
+​`
+Request → logsRouter.param (fetches + validates log, sets req.log)
+                ↓
+          tagsRouter (just uses req.log — no fetching, no validation)
+                ↓
+          tag controller (clean, no repeated logic)
+​`
+
+---
+
 ## 📛 Naming Conventions
 
 | What                 | Convention                 | Example                                     |
