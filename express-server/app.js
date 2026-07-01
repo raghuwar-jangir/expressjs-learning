@@ -42,6 +42,11 @@ app.get("/beans", (_, res, next) => {
   res.send("hello world");
 });
 
+//redirecting route interesting
+app.get("/raghuwar", (_, res) => {
+  res.redirect("https://raghuwar.vercel.app/");
+});
+
 app.post("/beans", (req, res) => {
   let body = "";
   let chunk = 1;

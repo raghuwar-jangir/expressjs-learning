@@ -1,0 +1,10 @@
+GET /favicon.ico 404 150 - 0.879 ms
+GET /beans/ 304 - - 1.692 ms
+GET /beans/ 304 - - 2.344 ms
+GET /raghuwar 404 147 - 1.100 ms
+GET /raghuwar 404 147 - 0.575 ms
+GET /raghuwar 302 57 - 2.082 ms
+GET /.well-known/appspecific/com.chrome.devtools.json 404 187 - 0.700 ms
+GET /.well-known/appspecific/com.chrome.devtools.json 404 187 - 0.606 ms
+GET /raghuwar 302 57 - 0.402 ms
+GET /raghuwar 302 50 - 0.245 ms
