@@ -105,3 +105,10 @@ GET /logs/1/tags/99 404 38 - 0.879 ms
 GET /logs/1/tags/1 200 28 - 1.178 ms
 GET /logs/3/tags 404 38 - 0.953 ms
 GET /logs/1/tags 200 30 - 0.589 ms
+GET / 200 8172 - 4.179 ms
+GET /favicon.ico 404 57 - 2.654 ms
+GET /.well-known/appspecific/com.chrome.devtools.json 404 94 - 0.746 ms
+GET / 304 - - 0.595 ms
+GET /.well-known/appspecific/com.chrome.devtools.json 404 94 - 0.272 ms
+GET / 304 - - 0.390 ms
+GET /.well-known/appspecific/com.chrome.devtools.json 404 94 - 0.206 ms
