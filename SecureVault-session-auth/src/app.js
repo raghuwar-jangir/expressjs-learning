@@ -14,8 +14,10 @@ const { errorHandler } = require("./middlewares/errorhandler.middleware");
 const {
   authenticationHandler,
 } = require("./middlewares/authenticate.middlware");
+const { rateLimiter } = require("./middlewares/rate-limiter.middleware");
 
 const app = express();
+app.set("trust proxy", true); //for getting ip address
 
 app.use(morganMiddleware());
 app.use(express.json());
@@ -24,7 +26,7 @@ app.use(handleCors);
 app.use(sessionMiddleware());
 
 app.get("/", (req, res, next) => {
-  res.json("hello world");
+  res.send("hello world");
 });
 
 app.get("/private-route", authenticationHandler, (req, res, next) => {
@@ -34,7 +36,7 @@ app.get("/private-route", authenticationHandler, (req, res, next) => {
   });
 });
 
-app.post("/login", (req, res, next) => {
+app.post("/login", rateLimiter, (req, res, next) => {
   const { username, password } = req.body;
   if (username === name && password === pass) {
     req.session.regenerate((err) => {
