@@ -6,7 +6,7 @@ const sessionMiddleware = () =>
   session({
     secret: process.env.SECRET,
     name: "svid",
-    rolling: true, //extend session if visited withing expiry
+    rolling: true, //resets expiry on activity
     cookie: {
       maxAge: 30 * 1000, //2 hours
       secure: process.env.NODE_ENV === "production",
