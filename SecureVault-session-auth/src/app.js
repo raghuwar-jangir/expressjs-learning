@@ -36,6 +36,117 @@ app.get("/private-route", authenticationHandler, (req, res, next) => {
   });
 });
 
+app.get("/landing", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Login</title>
+
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          background: #f4f4f4;
+          margin: 0;
+        }
+
+        .login-container {
+          background: white;
+          padding: 24px;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          width: 320px;
+        }
+
+        h2 {
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        input {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 12px;
+          box-sizing: border-box;
+        }
+
+        button {
+          width: 100%;
+          padding: 10px;
+          cursor: pointer;
+        }
+
+        #result {
+          margin-top: 12px;
+          white-space: pre-wrap;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="login-container">
+        <h2>Login</h2>
+
+        <form id="loginForm">
+          <input
+            type="text"
+            id="username"
+            placeholder="Username"
+            required
+          />
+
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          />
+
+          <button type="submit">Login</button>
+        </form>
+
+        <div id="result"></div>
+      </div>
+
+      <script>
+        const form = document.getElementById("loginForm");
+        const result = document.getElementById("result");
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch("http://localhost:4001/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              credentials: "include",
+              body: JSON.stringify({
+                username,
+                password
+              })
+            });
+
+            const data = await response.json();
+            result.textContent = JSON.stringify(data, null, 2);
+          } catch (error) {
+            result.textContent = "Error: " + error.message;
+          }
+        });
+      </script>
+    </body>
+    </html>
+  `);
+});
+
 app.post("/login", rateLimiter, (req, res, next) => {
   const { username, password } = req.body;
   if (username === name && password === pass) {
@@ -50,7 +161,8 @@ app.post("/login", rateLimiter, (req, res, next) => {
         };
         req.session.save((err) => {
           if (err) return next(err);
-          return res.status(200).send("successfully logged in");
+          // return res.redirect("/private-route");
+          return res.status(200).json("successfully logged in");
         });
       }
     });

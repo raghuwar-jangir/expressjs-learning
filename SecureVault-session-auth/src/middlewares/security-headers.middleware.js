@@ -10,7 +10,7 @@ const securityHeaders = (_, res, next) => {
     ); // not for development mode. // set on nginx code for both frontend and backend
   }
   //it convert http url https automatically after https url is visited even for once
-  res.setHeader("Content-Security-Policy", "default-src 'self'"); //prevent browser to load content from unknown sources, set on frontend server
+  // res.setHeader("Content-Security-Policy", "default-src 'self'"); //prevent browser to load content from unknown sources, set on frontend server
   next();
 };
 

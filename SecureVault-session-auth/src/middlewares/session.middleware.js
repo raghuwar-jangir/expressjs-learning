@@ -8,9 +8,9 @@ const sessionMiddleware = () =>
     name: "svid",
     rolling: true, //resets expiry on activity
     cookie: {
-      maxAge: 30 * 1000, //2 hours
+      maxAge: 300 * 1000, //2 hours
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // because our frontend and backend are different origin,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // because our frontend and backend are different origin,
       // thats why we have CORS. so "none" is right here
       httpOnly: true,
     },

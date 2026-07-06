@@ -10,7 +10,7 @@ const handleCors = (req, res, next) => {
   res.setHeader("Access-Control-Allow-Credentials", "true"); //Without this header explicitly set to "true",
   // the browser will silently discard the session cookie
   if (req.method === "OPTIONS") {
-    return res.status(204).send();
+    return res.status(204).json();
   }
   next();
 };

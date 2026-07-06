@@ -16,3 +16,7 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is listening on ${PORT}`);
 });
+
+app.listen(3000, () => {
+  console.log(`Server is listening on ${3000}`);
+});
