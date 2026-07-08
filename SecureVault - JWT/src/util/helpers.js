@@ -36,10 +36,13 @@ const readDatabase = async () => {
   return data;
 };
 
+//Your refresh-table JSON is small (a few KB, grows slowly) → streams are overkill here, and you're using them wrong (not awaiting finish).
 const writeDatabase = async (newData) => {
-  const writeStream = await fs.createWriteStream(dataFilePath);
-  writeStream.write(JSON.stringify({ data: newData }));
-  writeStream.end();
+  // const writeStream = fs.createWriteStream(dataFilePath);
+  // writeStream.write(JSON.stringify({ data: newData }));
+  // writeStream.end();
+  await fs.promises.writeFile(dataFilePath, JSON.stringify({ data: newData }));
+  return;
 };
 
 const generateError = (code, message) => {

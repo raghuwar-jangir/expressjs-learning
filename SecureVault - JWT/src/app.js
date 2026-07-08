@@ -1,13 +1,15 @@
 //app.js
 const express = require("express");
-const path = require("path");
 const fs = require("fs");
+
+const { SignJWT, jwtVerify, errors } = require("jose");
+const cookieParser = require("cookie-parser");
+const argon2 = require("argon2");
+const path = require("path");
 require("dotenv").config({
   path: path.join(__dirname, "../.env.local"),
 });
-//.env
-const { SignJWT, jwtVerify, errors } = require("jose");
-const cookieParser = require("cookie-parser");
+
 const { database } = require("./store/data.store");
 const {
   generateToken,
@@ -18,10 +20,147 @@ const {
 } = require("./util/helpers");
 
 const app = express();
-const secret = new TextEncoder().encode(process.env.SECRET); //Uint8Array needed
+const access_secret = new TextEncoder().encode(process.env.ACCESS_SECRET); //Uint8Array needed
+const refresh_secret = new TextEncoder().encode(process.env.REFRESH_SECRET); //Uint8Array needed
 ///////////////////////------------->>>>>>>>>>>
 app.use(express.json());
 app.use(cookieParser());
+
+app.get("/register", (req, res) => {
+  res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Register</title>
+  
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f4f4f4;
+            margin: 0;
+          }
+  
+          .login-container {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 320px;
+          }
+  
+          h2 {
+            margin-bottom: 20px;
+            text-align: center;
+          }
+  
+          input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+          }
+  
+          button {
+            width: 100%;
+            padding: 10px;
+            cursor: pointer;
+          }
+  
+          #result {
+            margin-top: 12px;
+            white-space: pre-wrap;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="login-container">
+          <h2>Login</h2>
+  
+          <form id="loginForm">
+            <input
+              type="text"
+              id="username"
+              placeholder="Username"
+              required
+            />
+  
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              required
+            />
+  
+            <button type="submit">Login</button>
+          </form>
+  
+          <div id="result"></div>
+        </div>
+  
+        <script>
+          const form = document.getElementById("loginForm");
+          const result = document.getElementById("result");
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+  
+            try {
+              const response = await fetch("http://localhost:4001/register", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                  username,
+                  password
+                })
+              });
+
+  
+              const data = await response.json();
+              result.textContent = "Successfully Registered ✅";
+            } catch (error) {
+              result.textContent = "Error: " + error.message;
+            }
+          });
+        </script>
+      </body>
+      </html>
+    `);
+});
+
+const validate = (req, res, next) => {
+  if (!req.body.username || !req.body.password) {
+    return next(generateError(401, "Enter both username and password"));
+  } else {
+    if (database[req.body.username]) {
+      return next(generateError(409, "User Does not exist!"));
+    }
+    return next();
+  }
+};
+
+app.post("/register", validate, async (req, res, next) => {
+  const { username, password } = req.body;
+  try {
+    const hashedPassword = await argon2.hash(password);
+    database[username] = {
+      username,
+      password: hashedPassword,
+    };
+    return res.status(201).json({ message: "User Created Successfully!" });
+  } catch (error) {
+    return next(generateError(500, "Internal Server Error"));
+  }
+});
 
 app.get("/login", (req, res) => {
   res.send(`
@@ -121,10 +260,8 @@ app.get("/login", (req, res) => {
                 })
               });
 
-              console.log("response>>",response)
-  
               const data = await response.json();
-              result.textContent = "success fully logged in ✅";
+              result.textContent = data.message;
             } catch (error) {
               result.textContent = "Error: " + error.message;
             }
@@ -137,16 +274,25 @@ app.get("/login", (req, res) => {
 
 app.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
-  if (
-    username === database[username].username &&
-    password === database[username].password
-  ) {
+  if (!database[username]) {
+    return next(generateError(401, "User does not exist!"));
+  }
+  console.log("database>>", database);
+
+  const passWordmatching = await argon2.verify(
+    database[username].password,
+    password,
+  );
+
+  // argon2.verify(storedHash, plainPassword);
+
+  if (passWordmatching) {
     const accessToken = await generateToken(
       "access",
       {
         username,
       },
-      secret,
+      access_secret,
     );
 
     const refreshToken = await generateToken(
@@ -154,7 +300,7 @@ app.post("/login", async (req, res, next) => {
       {
         username,
       },
-      secret,
+      refresh_secret,
     );
 
     const data = await readDatabase();
@@ -176,10 +322,7 @@ app.post("/login", async (req, res, next) => {
       sameSite: "strict",
     });
 
-    res.status(200).json({
-      //   accessToken,
-      refreshToken,
-    });
+    res.status(200).json({ message: "Logged in Successfully" });
   } else {
     next(generateError(401, "Invalid Credentials"));
     return;
@@ -190,7 +333,7 @@ app.get("/refresh", async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken;
   if (refreshToken) {
     try {
-      const valid = await jwtVerify(refreshToken, secret);
+      const valid = await jwtVerify(refreshToken, refresh_secret);
       const data = await readDatabase();
 
       const oldRefreshIndex = data.findIndex(
@@ -211,14 +354,14 @@ app.get("/refresh", async (req, res, next) => {
           {
             username: valid.payload.username,
           },
-          secret,
+          access_secret,
         );
         const newRefreshToken = await generateToken(
           "refresh",
           {
             username: valid.payload.username,
           },
-          secret,
+          refresh_secret,
         );
 
         const newRefreshObj = generateNewRefreshObject(
@@ -240,7 +383,9 @@ app.get("/refresh", async (req, res, next) => {
           httpOnly: true,
           sameSite: "strict",
         });
-        res.status(200).send("Sent new Refresh token");
+        res.status(200).send({
+          message: "Sent new Refresh token",
+        });
       } else if (oldRefreshToken?.status === "ROTATED") {
         const newData = data.filter(
           (item) => item.username !== valid.payload.username,
@@ -287,7 +432,9 @@ app.get("/logout", async (req, res, next) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
 
-  res.status(200).send("logged out");
+  res.status(200).send({
+    message: "logged out",
+  });
 });
 
 //private route
@@ -295,12 +442,8 @@ const authenticate = async (req, res, next) => {
   const accessToken = req.cookies.accessToken;
   if (accessToken) {
     try {
-      const valid = await jwtVerify(accessToken, secret);
-      if (valid.payload.tokenType === "access") {
-        return next();
-      } else {
-        return next(generateError(401, "only access token allowed"));
-      }
+      const valid = await jwtVerify(accessToken, access_secret);
+      return next();
     } catch (error) {
       if (error.code === "ERR_JWT_EXPIRED") {
         return next(generateError(401, "Unauthorized"));
@@ -326,4 +469,5 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
+
 module.exports = { app };
