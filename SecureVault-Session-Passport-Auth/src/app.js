@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const createError = require("http-errors");
+const passport = require("passport");
 
 const database = {
   sam: {
@@ -12,12 +13,16 @@ const database = {
 
 const { sessionHandler } = require("./middlewares/session.middleware");
 const { errorHandler } = require("./middlewares/error-handler.middleware");
-const passport = require("passport");
 const { checkAuth } = require("./middlewares/check-auth.middleware");
+
 const argon = require("argon2");
+const {
+  securityHeaders,
+} = require("./middlewares/security-headers.middleware");
 const LocalStrategy = require("passport-local").Strategy;
 
 //global middlewares
+app.use(securityHeaders);
 app.use(sessionHandler());
 app.use(express.json());
 
