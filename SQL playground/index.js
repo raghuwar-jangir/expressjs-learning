@@ -1,20 +1,27 @@
-const sqlite3 = require("sqlite3").verbose();
+const Database = require("better-sqlite3");
 
-const db = new sqlite3.Database("db/MyDB.db");
+const db = Database("db/MyDB.db");
 
-const query = `
-SELEcT *, name,age FROM celebs;
-`;
+const readQuery = /* sql */ `
+  SELECT * FROM friends;
+  `;
 
-// db.run(query);
-db.all(query, (err, data) => {
-  console.log("🚀 ------------------------------🚀");
-  console.log("🚀 ~ index.js:11 ~ err >>>", err);
-  console.log("🚀 ------------------------------🚀");
-  console.log("🚀 ~ index.js:11 ~ data >>>", data);
-  console.log("🚀 --------------------------------🚀");
-});
+const query = process.argv[2];
 
-console.log("QUERY SUCCESSFULY RAN ✅");
+try {
+  if (query) {
+    db.prepare(query).run();
+    console.log("✅ QUERY Successfull ✅");
+  } else {
+    const result = db.prepare(readQuery).all();
+    console.log("🚀 ------------------------------------🚀");
+    console.log();
+    console.log(result);
+    console.log();
+    console.log("🚀 ------------------------------------🚀");
+  }
+} catch (error) {
+  console.error("❌ Error", error);
+}
 
 db.close();
