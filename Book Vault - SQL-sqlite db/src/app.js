@@ -1,15 +1,31 @@
 const express = require("express");
 
-const { errorHandler } = require("./middlewares/error-handler.middleware");
-const generateError = require("http-errors");
+const createError = require("http-errors");
+
 const app = express();
 
-app.get("/", () => {
+//ROUTERS
+const { authRouter } = require("./routes/auth.route");
+
+//import middlewares
+const { errorHandler } = require("./middlewares/error-handler.middleware");
+
+/////////////
+
+app.use(express.json());
+
+app.get("/", (req, res, next) => {
   res.send("helllo world");
 });
 
+app.use("/auth", authRouter);
+/////////////
 app.use((req, res, next) => {
-  next(generateError(404, "Not Found"));
+  next(
+    createError(404, "Not Found", {
+      code: "NOT_FOUND",
+    }),
+  );
 });
 
 app.use(errorHandler);
