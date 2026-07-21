@@ -1,6 +1,6 @@
 const argon2 = require("argon2");
 
-const hashPassword = async (plainPassword) => {
+const hashThePassword = async (plainPassword) => {
   return await argon2.hash(plainPassword);
 };
 
@@ -9,6 +9,6 @@ const comparePassword = async (hashedPassword, plainPassword) => {
 };
 
 module.exports = {
-  hashPassword,
+  hashThePassword,
   comparePassword,
 };

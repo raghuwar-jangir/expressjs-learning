@@ -1,40 +1,23 @@
 // naming tip: Service name = what's actually happening in business terms
 
 const createHttpError = require("http-errors");
-const db = require("../db/connection.js");
 
-const { hashPassword, comparePassword } = require("../utils/hash.util");
+const { comparePassword, hashThePassword } = require("../utils/hash.util");
 const { generateNewId } = require("../utils/id.util");
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../utils/jwt.utils.js");
 
-const findUserByEmail = (email) => {
-  const query = `
-  SELECT
-    *
-  FROM 
-    users
-  WHERE 
-    email = ?
-  `;
+const userRepository = require("../repositories/user.repository.js");
 
-  const result = db.prepare(query).get(email);
+const findUserByEmail = (email) => {
+  const result = userRepository.findByEmail(email);
   return result;
 };
 
 const findUserById = (id) => {
-  const query = `
-  SELECT
-    *
-  FROM 
-    users
-  WHERE 
-    id = ?
-  `;
-
-  const result = db.prepare(query).get(id);
+  const result = userRepository.findById(id);
   return result;
 };
 
@@ -46,19 +29,9 @@ const registerUser = async (userEmail, userPassword) => {
     });
   }
   const id = generateNewId();
-  const hashedPassword = await hashPassword(userPassword);
+  const hashedPassword = await hashThePassword(userPassword);
 
-  const query = /*sql*/ `
-    INSERT INTO
-      users (
-        id, email, password_hash
-      )
-    VALUES(
-      ?, ?, ?
-    )
-    `;
-
-  db.prepare(query).run(id, userEmail, hashedPassword);
+  userRepository.insert(id, email, hashedPassword);
   const user = findUserById(id);
   return {
     id: user.id,
@@ -106,4 +79,5 @@ const authenticateUser = async (userEmail, userPassword) => {
 module.exports = {
   authenticateUser,
   registerUser,
+  findUserById,
 };

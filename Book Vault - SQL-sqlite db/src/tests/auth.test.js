@@ -75,6 +75,7 @@ describe("POST auth/login", () => {
     expect(res.body.data.user.email).toBe(testUser.email);
 
     // real jose now — tokens should be real, defined, non-empty strings
+    expect(res.body.data.user.password_hash).toBeUndefined();
     expect(res.body.data.accessToken).toBeDefined();
     expect(res.body.data.refreshToken).toBeDefined();
     expect(typeof res.body.data.accessToken).toBe("string");

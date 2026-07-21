@@ -1,6 +1,6 @@
 const createHttpError = require("http-errors");
 
-const validateRegistration = (req, res, next) => {
+const validate = (req, res, next) => {
   if (!req.body.email || !req.body.password) {
     return next(
       createHttpError(400, "Missing Credentials", {
@@ -12,5 +12,5 @@ const validateRegistration = (req, res, next) => {
 };
 
 module.exports = {
-  validateRegistration,
+  validate,
 };
