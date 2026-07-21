@@ -2,8 +2,8 @@ CREATE TABLE IF NOT EXISTS
     users (
         id TEXT PRIMARY KEY, 
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL, 
-        created_at DATE NOT NULL
+        password_hash TEXT NOT NULL, 
+        created_at DATE DEFAULT CURRENT_TIMESTAMP
     );
 
 CREATE TABLE IF NOT EXISTS

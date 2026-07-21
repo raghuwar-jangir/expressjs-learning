@@ -15,7 +15,7 @@ const { errorHandler } = require("./middlewares/error-handler.middleware");
 app.use(express.json());
 
 app.get("/", (req, res, next) => {
-  res.send("helllo world");
+  res.send("hello world");
 });
 
 app.use("/auth", authRouter);
@@ -30,6 +30,4 @@ app.use((req, res, next) => {
 
 app.use(errorHandler);
 
-module.exports = {
-  app,
-};
+module.exports = app;

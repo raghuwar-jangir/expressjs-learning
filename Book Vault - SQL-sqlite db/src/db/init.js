@@ -3,15 +3,26 @@
 // Server context, small file       ==>>>   await fs.promises.readFile()
 // Server context, large file       ==>>>   fs.createReadStream()
 
+const NODE_ENV = process.env.NODE_ENV; //set NODE_ENV from command
+const path = require("path");
+
+require("dotenv").config({
+  path: path.join(
+    __dirname,
+    NODE_ENV == "test" ? "../../.env.test" : "../../.env.local",
+  ),
+});
+
 const Database = require("better-sqlite3");
 
 const fs = require("fs");
-const path = require("path");
+
+const dbPath = process.env.DB_PATH;
 
 // const db = new Database("./bookvault.db"); ❌ //file location depends on cwd, from where the init file executed,
 
 // 🧠 Production rule 🧠: //always use path module for path related work
-const db = new Database(path.join(__dirname, "../../bookvault.db"));
+const db = new Database(path.join(__dirname, dbPath));
 
 // 🧠 Production rule 🧠: setup/config scripts should fail loudly.
 const data = fs.readFileSync(path.join(__dirname, "./schema.sql"));

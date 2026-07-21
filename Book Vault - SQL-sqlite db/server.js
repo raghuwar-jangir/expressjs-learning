@@ -4,7 +4,7 @@ require("dotenv").config({
   path: path.join(__dirname, ".env.local"),
 });
 
-const { app } = require("./src/app");
+const app = require("./src/app");
 
 const PORT = process.env.PORT;
 

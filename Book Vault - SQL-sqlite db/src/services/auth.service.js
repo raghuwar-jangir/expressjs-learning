@@ -1,17 +1,19 @@
 // naming tip: Service name = what's actually happening in business terms
 
 const createHttpError = require("http-errors");
-const db = require("../db/connection");
+const db = require("../db/connection.js");
 
-const { hashPassword } = require("../utils/hash.util");
+const { hashPassword, comparePassword } = require("../utils/hash.util");
 const { generateNewId } = require("../utils/id.util");
-
-const authenticateUser = () => {};
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../utils/jwt.utils.js");
 
 const findUserByEmail = (email) => {
   const query = `
   SELECT
-    name
+    *
   FROM 
     users
   WHERE 
@@ -48,14 +50,57 @@ const registerUser = async (userEmail, userPassword) => {
 
   const query = /*sql*/ `
     INSERT INTO
-      users
+      users (
+        id, email, password_hash
+      )
     VALUES(
       ?, ?, ?
     )
     `;
 
-  db.prepare(query).run(id, email, hashedPassword);
-  return findUserById(id);
+  db.prepare(query).run(id, userEmail, hashedPassword);
+  const user = findUserById(id);
+  return {
+    id: user.id,
+    email: user.email,
+    created_at: user.created_at,
+  };
+};
+
+const authenticateUser = async (userEmail, userPassword) => {
+  const user = findUserByEmail(userEmail);
+  if (!user) {
+    throw createHttpError(401, "Invalid email or password", {
+      code: "INVALID_CREDENTIALS",
+    });
+  }
+
+  const isPasswordMatching = await comparePassword(
+    user.password_hash,
+    userPassword,
+  );
+  if (!isPasswordMatching) {
+    throw createHttpError(401, "Invalid email or password", {
+      code: "INVALID_CREDENTIALS",
+    });
+  }
+
+  const payload = {
+    sub: user.id,
+    email: user.email,
+  };
+
+  const accessToken = await generateAccessToken(payload);
+  const refreshToken = await generateRefreshToken(payload);
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+    },
+    accessToken,
+    refreshToken,
+  };
 };
 
 module.exports = {
