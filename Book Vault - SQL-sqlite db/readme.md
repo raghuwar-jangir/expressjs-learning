@@ -11,3 +11,5 @@
 9. if err.code is undefined means INTERNAL SERVER ERROR
 10. use fail fast approach
 11. catch error on controller funciton only
+12. add repository layer for datbase talking
+13. layer = route (mapping path,method to handler function) , controller (using service layer), service (business layer), repository (database layer)
