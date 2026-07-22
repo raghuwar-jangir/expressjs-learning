@@ -89,7 +89,7 @@ describe("POST auth/login", () => {
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
-    expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
+    expect(res.body.error.code).toBe("UNAUTHORIZED");
   });
 
   // --- NON-EXISTENT EMAIL ---
@@ -100,7 +100,7 @@ describe("POST auth/login", () => {
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
-    expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
+    expect(res.body.error.code).toBe("UNAUTHORIZED");
   });
 
   // --- SAME MESSAGE FOR BOTH FAILURE CASES — security check ---

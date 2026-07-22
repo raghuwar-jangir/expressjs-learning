@@ -10,11 +10,20 @@ const getAllBooks = (req, res, next) => {
   }
 };
 
-const addBook = (req, res, next) => {};
-const updateBookDetails = (req, res, next) => {};
-const removeBook = (req, res, next) => {};
+const addBook = (req, res, next) => {
+  try {
+    const book = booksService.createBook(req.body);
+    return sendResponse(res, 201, book, "Book added Successfully");
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const searchBookByTitle = (req, res, next) => {};
+
+const removeBook = (req, res, next) => {};
 const topRatedBooks = (req, res, next) => {};
+const updateBookDetails = (req, res, next) => {};
 
 module.exports = {
   getAllBooks,

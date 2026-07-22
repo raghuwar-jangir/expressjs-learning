@@ -10,6 +10,7 @@ const errorHandler = (err, req, res, next) => {
     error: {
       message,
       code,
+      ...(err.details ? { detail: err.details[0].message } : {}),
     },
   });
 };

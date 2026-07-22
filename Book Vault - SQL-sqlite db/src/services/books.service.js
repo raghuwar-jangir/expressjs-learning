@@ -1,13 +1,32 @@
 const bookRepository = require("../repositories/book.repository");
+const { generateNewId } = require("../utils/id.util");
 
-const findAllBooks = (req, res, next) => {
+const findAllBooks = () => {
   return bookRepository.findAll();
 };
 
-const createBook = (req, res, next) => {};
+const createBook = (bookBody) => {
+  const id = generateNewId();
+
+  bookRepository.insert(
+    id,
+    bookBody.title,
+    bookBody.author,
+    bookBody.price,
+    bookBody.rating,
+    bookBody.pages,
+    bookBody.publish_year,
+  );
+
+  return bookRepository.findById(id);
+};
+
+const findBookByTitle = (title) => {
+  return bookRepository.findByTitle(title);
+};
+
 const updateBook = (req, res, next) => {};
 const deleteBook = (req, res, next) => {};
-const findBookByTitle = (req, res, next) => {};
 const topRatedBooks = (req, res, next) => {};
 
 module.exports = {

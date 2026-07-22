@@ -1,9 +1,13 @@
 const path = require("path");
 
-require("dotenv").config({
-  path: path.join(__dirname, ".env.local"),
-});
+const NODE_ENV = process.env.NODE_ENV;
 
+require("dotenv").config({
+  path: path.join(
+    __dirname,
+    NODE_ENV == "test" ? "./.env.test" : "./.env.local",
+  ),
+});
 const app = require("./src/app");
 
 const PORT = process.env.PORT;

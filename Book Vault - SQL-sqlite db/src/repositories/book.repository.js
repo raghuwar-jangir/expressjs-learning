@@ -24,7 +24,34 @@ const findByTitle = (text) => {
   return db.prepare(query).all(text);
 };
 
+const findById = (id) => {
+  const query = /*sql*/ `
+        SELECT 
+            *
+        FROM
+            books
+        WHERE
+            id = ?;
+    `;
+
+  return db.prepare(query).get(id);
+};
+
+const insert = (id, title, author, price, rating, pages, publish_year) => {
+  const query = /*sql*/ `
+    INSERT INTO 
+        books 
+        (id, title, author, price, rating, pages, publish_year)
+    VALUES
+      (?, ?, ?, ?, ?, ?, ?);
+    `;
+
+  db.prepare(query).run(id, title, author, price, rating, pages, publish_year);
+};
+
 module.exports = {
   findAll,
   findByTitle,
+  insert,
+  findById,
 };

@@ -36,7 +36,7 @@ const insert = (id, email, password_hash) => {
       ?, ?, ?
     )
     `;
-  db.prepare(query).run(id, userEmail, password_hash);
+  db.prepare(query).run(id, email, password_hash);
 };
 
 module.exports = {

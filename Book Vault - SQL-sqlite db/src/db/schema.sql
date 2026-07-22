@@ -14,6 +14,6 @@ CREATE TABLE IF NOT EXISTS
         price REAL CHECK (price >= 0),
         rating INTEGER CHECK (rating >=1 AND rating <=5),
         pages INTEGER NOT NULL,
-        publish_date DATE,
+        publish_year INTEGER NOT NULL,
         created_at DATE DEFAULT CURRENT_TIMESTAMP
     )

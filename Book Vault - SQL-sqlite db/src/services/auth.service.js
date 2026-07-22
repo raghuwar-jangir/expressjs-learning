@@ -31,7 +31,7 @@ const registerUser = async (userEmail, userPassword) => {
   const id = generateNewId();
   const hashedPassword = await hashThePassword(userPassword);
 
-  userRepository.insert(id, email, hashedPassword);
+  userRepository.insert(id, userEmail, hashedPassword);
   const user = findUserById(id);
   return {
     id: user.id,
@@ -44,7 +44,7 @@ const authenticateUser = async (userEmail, userPassword) => {
   const user = findUserByEmail(userEmail);
   if (!user) {
     throw createHttpError(401, "Invalid email or password", {
-      code: "INVALID_CREDENTIALS",
+      code: "UNAUTHORIZED",
     });
   }
 
@@ -54,7 +54,7 @@ const authenticateUser = async (userEmail, userPassword) => {
   );
   if (!isPasswordMatching) {
     throw createHttpError(401, "Invalid email or password", {
-      code: "INVALID_CREDENTIALS",
+      code: "UNAUTHORIZED",
     });
   }
 
