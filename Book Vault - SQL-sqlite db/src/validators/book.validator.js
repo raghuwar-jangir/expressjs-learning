@@ -5,7 +5,7 @@ const createBookSchema = z.object({
   title: z.string().min(1, "Title is required"),
   author: z.string().min(1, "Author is required"),
   price: z.number().min(0, "Price must be at least 0").optional(),
-  rating: z.number().int().min(1).max(5).optional(),
+  rating: z.number().min(1).max(5).optional(),
   pages: z.number().int().positive("Pages must be greater than 0"),
   publish_year: z
     .number()
@@ -19,4 +19,5 @@ const updateBookSchema = createBookSchema.partial();
 const searchQuerySchema = z.object({
   title: z.string(),
 });
+
 module.exports = { createBookSchema, updateBookSchema, searchQuerySchema };
