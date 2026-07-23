@@ -12,7 +12,7 @@ const findAll = () => {
 };
 
 const findByTitle = (text) => {
-  const query = `
+  const query = /*sql*/ `
         SELECT 
             *
         FROM
@@ -60,10 +60,48 @@ const deleteById = (id) => {
   db.prepare(query).run(id);
 };
 
+const update = (id, fields) => {
+  const keys = Object.keys(fields);
+
+  const setClause = keys
+    .map((key) => {
+      return `${key} = ?`;
+    })
+    .join(", ");
+
+  const values = keys.map((k) => fields[k]);
+
+  const query = /*sql*/ `
+    UPDATE 
+      books
+    SET   
+     ${setClause}
+    WHERE id = ?;
+  `;
+
+  db.prepare(query).run(...values, id);
+};
+
+const topRated = () => {
+  const query = /*sql*/ `
+    SELECT
+      *
+    FROM 
+      books
+    WHERE 
+      rating >= ?;  
+  `;
+
+  const result = db.prepare(query).all(4.5);
+  return result;
+};
+
 module.exports = {
   findAll,
   findByTitle,
   insert,
   findById,
   deleteById,
+  update,
+  topRated,
 };

@@ -16,4 +16,7 @@ const createBookSchema = z.object({
 const updateBookSchema = createBookSchema.partial();
 // .partial() makes every field optional — update requests may send only the fields changing
 
-module.exports = { createBookSchema, updateBookSchema };
+const searchQuerySchema = z.object({
+  title: z.string(),
+});
+module.exports = { createBookSchema, updateBookSchema, searchQuerySchema };

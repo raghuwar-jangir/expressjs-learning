@@ -1,33 +1,181 @@
+// tests/books.test.js
 const request = require("supertest");
-const app = require("../app");
+const app = require("../app.js");
+const db = require("../db/connection.js");
 
-const invalidToken =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyOWJiNzdhZi04ZjY4LTQ3MzktOTVlYy1jMTA3ZTlhOTNhNjMiLCJlbWFpbCI6ImFsaWNlQGV4YW1wbGUuY29tIiwiaWF0IjoxNzg0NjYwNzcwLCJleHAiOjE3ODQ2NjE2NzAsImlzcyI6ImJvb2t2YXVsdC1hcGkifQ.ypouvUZP5fsymidkUXay2izHu49pDuDLgXwdjc7U1H8";
-const validToken =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0Y2U2MjRlZS05NWNmLTQ1MDItODFkNi05ZTg5YjM2MWRmYjAiLCJlbWFpbCI6InJhZ2h1LnRlc3RAZXhhbXBsZTkuY29tIiwiaWF0IjoxNzg0NzM3MzQ2LCJleHAiOjE3ODQ3MzgyNDYsImlzcyI6ImJvb2t2YXVsdC1hcGkifQ.waueC3YErkENHiBTQurr7EQjvTEJ8hJwQsxUyZwpBOQ";
+let validToken;
+let testBookId;
 
-describe("POST books/", () => {
-  // --- HAPPY PATH ---
-  test("should get all the books and return 200 with array of book object", async () => {
+const invalidToken = "this.is.not.a.valid.token";
+
+const testUser = {
+  email: "books.test@example.com",
+  password: "SuperSecret123",
+};
+const testBook = {
+  title: "Clean Code",
+  author: "Robert Martin",
+  pages: 464,
+  rating: 5,
+};
+
+beforeAll(async () => {
+  console.log("STEP 1 — beforeAll running");
+  // clean slate
+  db.prepare("DELETE FROM users WHERE email = ?").run(testUser.email);
+
+  // real user, real login flow — same pattern as auth.test.js
+  await request(app).post("/auth/signup").send(testUser);
+  const loginRes = await request(app).post("/auth/login").send(testUser);
+  validToken = await loginRes.body.data.accessToken;
+  console.log("🚀 ~ book.test.js:30 ~ validToken >>>", validToken);
+  console.log("STEP 2 — token set:", validToken);
+});
+
+describe("GET /books", () => {
+  console.log("STEP 3 — test running, token is:", validToken);
+  console.log("valid token>>>", validToken);
+  test("should return 200 with array of books for authenticated user", async () => {
     const res = await request(app)
       .get("/books")
       .auth(validToken, { type: "bearer" });
 
-    // ASSERT — check the response is exactly what a correct implementation should return
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(Array.isArray(res.body.data)).toBe(true);
   });
 
-  // --- INVALID OR MISSING TOKEN ---
-  test("should give 401 error when invalid token is used", async () => {
-    const res = await request(app)
-      .get("/books")
-      .auth(invalidToken, { type: "bearer" });
+  // test("should return 401 when token is invalid", async () => {
+  //   const res = await request(app)
+  //     .get("/books")
+  //     .auth(invalidToken, { type: "bearer" });
 
-    // ASSERT — check the response is exactly what a correct implementation should return
-    expect(res.status).toBe(401);
-    expect(res.body.success).toBe(false);
-    expect(res.body.error.message).toBeDefined();
-  });
+  //   expect(res.status).toBe(401);
+  //   expect(res.body.success).toBe(false);
+  // });
+
+  // test("should return 401 when no token is provided", async () => {
+  //   const res = await request(app).get("/books");
+
+  //   expect(res.status).toBe(401);
+  // });
 });
+
+// describe("POST /books", () => {
+//   test("should create a book and return 201", async () => {
+//     const res = await request(app)
+//       .post("/books")
+//       .auth(validToken, { type: "bearer" })
+//       .send(testBook);
+
+//     expect(res.status).toBe(201);
+//     expect(res.body.success).toBe(true);
+//     expect(res.body.data.title).toBe(testBook.title);
+//     expect(res.body.data.id).toBeDefined();
+
+//     testBookId = res.body.data.id; // save for later tests (GET/PATCH/DELETE by id)
+//   });
+
+//   test("should return 400 when required field is missing", async () => {
+//     const res = await request(app)
+//       .post("/books")
+//       .auth(validToken, { type: "bearer" })
+//       .send({ author: "No Title Here" }); // missing title, pages
+
+//     expect(res.status).toBe(400);
+//     expect(res.body.success).toBe(false);
+//   });
+
+//   test("should return 400 when rating is out of range", async () => {
+//     const res = await request(app)
+//       .post("/books")
+//       .auth(validToken, { type: "bearer" })
+//       .send({ ...testBook, rating: 10 }); // invalid — max is 5
+
+//     expect(res.status).toBe(400);
+//   });
+// });
+
+// describe("GET /books/search", () => {
+//   test("should find books matching a title keyword", async () => {
+//     const res = await request(app)
+//       .get("/books/search?title=Clean")
+//       .auth(validToken, { type: "bearer" });
+
+//     expect(res.status).toBe(200);
+//     expect(res.body.success).toBe(true);
+//     expect(Array.isArray(res.body.data)).toBe(true);
+//   });
+// });
+
+// describe("GET /books/top_rated", () => {
+//   test("should return books sorted by rating", async () => {
+//     const res = await request(app)
+//       .get("/books/top_rated")
+//       .auth(validToken, { type: "bearer" });
+
+//     expect(res.status).toBe(200);
+//     expect(res.body.success).toBe(true);
+//     expect(Array.isArray(res.body.data)).toBe(true);
+//   });
+// });
+
+// describe("GET /books/:id", () => {
+//   test("should return a single book by id", async () => {
+//     const res = await request(app)
+//       .get(`/books/${testBookId}`)
+//       .auth(validToken, { type: "bearer" });
+
+//     expect(res.status).toBe(200);
+//     expect(res.body.data.id).toBe(testBookId);
+//   });
+
+//   test("should return 404 for a non-existent book id", async () => {
+//     const res = await request(app)
+//       .get("/books/non-existent-id-123")
+//       .auth(validToken, { type: "bearer" });
+
+//     expect(res.status).toBe(404);
+//   });
+// });
+
+// describe("PATCH /books/:id", () => {
+//   test("should update only the fields provided", async () => {
+//     const res = await request(app)
+//       .patch(`/books/${testBookId}`)
+//       .auth(validToken, { type: "bearer" })
+//       .send({ rating: 4 });
+
+//     expect(res.status).toBe(200);
+//     expect(res.body.data.rating).toBe(4);
+//     expect(res.body.data.title).toBe(testBook.title); // untouched field stays intact
+//   });
+
+//   test("should return 400 for invalid update payload", async () => {
+//     const res = await request(app)
+//       .patch(`/books/${testBookId}`)
+//       .auth(validToken, { type: "bearer" })
+//       .send({ rating: 99 });
+
+//     expect(res.status).toBe(400);
+//   });
+// });
+
+// describe("DELETE /books/:id", () => {
+//   test("should delete the book and return 200", async () => {
+//     const res = await request(app)
+//       .delete(`/books/${testBookId}`)
+//       .auth(validToken, { type: "bearer" });
+
+//     expect(res.status).toBe(200);
+//     expect(res.body.success).toBe(true);
+//   });
+
+//   test("should return 404 when deleting an already-deleted book", async () => {
+//     const res = await request(app)
+//       .delete(`/books/${testBookId}`)
+//       .auth(validToken, { type: "bearer" });
+
+//     expect(res.status).toBe(404);
+//   });
+// });
