@@ -12,16 +12,16 @@ const findAll = () => {
 };
 
 const findByTitle = (text) => {
-  const query = /*sql*/ `
+  const query = `
         SELECT 
             *
         FROM
             books
         WHERE
-            title LIKE "%?%";
+            title LIKE ?;
     `;
 
-  return db.prepare(query).all(text);
+  return db.prepare(query).all(`%${text}%`);
 };
 
 const findById = (id) => {
@@ -49,9 +49,21 @@ const insert = (id, title, author, price, rating, pages, publish_year) => {
   db.prepare(query).run(id, title, author, price, rating, pages, publish_year);
 };
 
+const deleteById = (id) => {
+  const query = /*sql*/ `
+    DELETE FROM 
+        books
+    WHERE   
+        id = ?;
+    `;
+
+  db.prepare(query).run(id);
+};
+
 module.exports = {
   findAll,
   findByTitle,
   insert,
   findById,
+  deleteById,
 };

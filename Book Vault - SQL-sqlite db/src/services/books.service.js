@@ -25,15 +25,22 @@ const findBookByTitle = (title) => {
   return bookRepository.findByTitle(title);
 };
 
-const updateBook = (req, res, next) => {};
-const deleteBook = (req, res, next) => {};
-const topRatedBooks = (req, res, next) => {};
+const findBookById = (id) => {
+  return bookRepository.findById(id);
+};
+
+const deleteBook = (id) => {
+  bookRepository.deleteById(id);
+};
+// const updateBook = (req, res, next) => {};
+// const topRatedBooks = (req, res, next) => {};
 
 module.exports = {
   findAllBooks,
   createBook,
-  updateBook,
+  //   updateBook,
   deleteBook,
   findBookByTitle,
-  topRatedBooks,
+  //   topRatedBooks,
+  findBookById,
 };

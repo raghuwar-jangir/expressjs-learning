@@ -1,14 +1,15 @@
 const authRouter = require("express").Router();
 
 const authController = require("../controllers/auth.controller");
+
 const { rateLimiter } = require("../middlewares/rate-limiter.middleware");
 const { validate } = require("../middlewares/validate.middleware");
 const { signupSchema, loginSchema } = require("../validators/auth.validator");
 
 authRouter.post(
   "/login",
-  rateLimiter,
   validate(loginSchema),
+  rateLimiter,
   authController.login,
 );
 
