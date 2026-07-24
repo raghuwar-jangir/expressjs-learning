@@ -12,4 +12,11 @@
 10. use fail fast approach
 11. catch error on controller funciton only
 12. add repository layer for datbase talking
-13. layer = route (mapping path,method to handler function) , controller (using service layer), service (business layer), repository (database layer)
+13. layer = route (mapping path,method to handler function) ,
+            controller (using service layer),
+            service (business layer), 
+            repository (database layer)
+14. used patch method for updating books
+15. used dynamic update SQL query please look a this
+16. constraints CHECK, please check table schema file
+17. wrote stats of books table.
